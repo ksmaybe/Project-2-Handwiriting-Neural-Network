@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import os
 
 
 class NeuralNetwork:
@@ -12,4 +13,7 @@ class NeuralNetwork:
 
 
 
-image=cv2.imread(img_name)
+image=cv2.imread("train_img/train_image_0.bmp",1)
+cv2.imshow('image',image)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
