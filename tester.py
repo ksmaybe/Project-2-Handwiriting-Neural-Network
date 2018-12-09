@@ -123,7 +123,7 @@ class Network:
 def main():
     topology = []
     topology.append(2)
-    topology.append(3)
+    topology.append(300)
     topology.append(2)
     net = Network(topology)
     Neuron.eta = 0.09
