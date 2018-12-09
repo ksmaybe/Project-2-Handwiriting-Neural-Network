@@ -37,16 +37,8 @@ import numpy as np
 #
 # print(train_lst)
 
-train_image="train_images.raw"
+z=np.array([1,2,3])
+l=np.array([4,3,2])
+x=z*l
 
-def byteToPixel(file,width,length):
-    stringcode='>'+'B'*len(file)
-    data=np.array(struct.unpack(stringcode,file))
-    data=data.reshape(int(len(file)/(width*length)),width*length,1)/255
-    return data
-
-ff=open(train_image,'rb')
-bytefile=ff.read()
-pixelfile=byteToPixel(bytefile,28,28)
-print(pixelfile[28*27][0])
-
+print(x)

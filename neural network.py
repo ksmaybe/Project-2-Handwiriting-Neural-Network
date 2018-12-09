@@ -6,14 +6,12 @@ import math
 import os
 from numba import vectorize
 
-
+np.random.seed(0)
 def sigmoid(x):
-    res=1/(1+math.e**(-x))
-    return res
+  return 1/(1+np.exp(-x))
 
 def sigmoid_derivative(x):
-    res=x*(1-x)
-    return res
+    return x*(1-x)
 
 class Connection:
     def __init__(self, con_neuron):
@@ -53,19 +51,55 @@ class Neuron:
     def feed_forward(self):
         sum=0
         if len(self.connectors)!=0:
+            x=[None]*len(self.connectors)
+            y=[None]*len(self.connectors)
+            i=0
             for con in self.connectors:
-                sum+=con.con_neuron.get_output()*con.weight
+                x[i]=con.con_neuron.output
+                y[i]=con.weight
+
+                i+=1
+            x=np.array(x)
+            y=np.array(y)
+            sum=np.dot(x,y)
+            self.output=sigmoid(sum)
         else:
-            return
-        self.output=sigmoid(sum)
+            self.output=0.5
 
 
     def back_propagate(self):
         self.gradient=self.error*sigmoid_derivative(self.output)
+        l=len(self.connectors)
+        x=[None]*l
+        y=[None]*l
+        z=[None]*l
+        w=[None]*l
+        cons=self.connectors
         for con in self.connectors:
+        #     x[i]=con[i].con_neuron.output
+        #     y[i]=con[i].d_weight
+        #     z[i]=con[i].con_neuron.error
+        #     w[i]=con[i].weight
+        # x=np.array(x)
+        # y=np.array(y)
+        # z=np.array(z)
+        # w=np.array(w)
+        # for i in range(l):
+        #     y[i]=self.E*(x[i]*self.gradient)+self.A*y[i]
+        #     w[i]=w[i]+y[i]
+        #     z[i]=z[i]+(w[i]*self.gradient)
+
+
+        # aa=self.E*x*self.gradient
+        # bb=self.A*y
+        # y=aa+bb
+        # w=w+y
+        # z=z+(w*self.gradient)
             con.d_weight=self.E*(con.con_neuron.output*self.gradient)+self.A*con.d_weight
             con.weight+=con.d_weight
             con.con_neuron.add_error(con.weight*self.gradient)
+
+
         self.error=0
 
 class N_Network:
@@ -89,11 +123,18 @@ class N_Network:
 
     def get_error(self,y):
         error=0
+        zz=[None]*len(y)
         for i in range(len(y)):
-            err=(y[i]-self.layer_list[-1][i].get_output())
-            error+=err**2
-        error/=len(y)
-        error=math.sqrt(error)
+
+            zz[i]=(y[i]-self.layer_list[-1][i].output)
+            #error+=err**2
+        zz=np.array(zz)
+        k=np.power(zz,2)
+        k=np.divide(k,len(y))
+        k=np.sum(k)
+        error=np.sqrt(k)
+        # error/=len(y)
+        # error=math.sqrt(error)
         return error
 
     def feed_forward(self):
@@ -102,8 +143,17 @@ class N_Network:
                 n.feed_forward()
 
     def back_propagate(self,prev):
+        kk=[None]*len(prev)
+        gg=[None]*len(prev)
         for i in range(len(prev)):
-            self.layer_list[-1][i].set_error(prev[i]-self.layer_list[-1][i].get_output())
+            kk[i]=prev[i]
+            gg[i]=self.layer_list[-1][i].output
+
+            #self.layer_list[-1][i].set_error(prev[i]-self.layer_list[-1][i].output)
+        kk=np.array(kk)
+        gg=np.array(gg)
+        for i in range(len(prev)):
+            self.layer_list[-1][i].error=kk[i]-gg[i]
         for layer in self.layer_list[::-1]:
             for n in layer:
                 n.back_propagate()
@@ -111,7 +161,7 @@ class N_Network:
     def get_results(self):
         output=[]
         for n in self.layer_list[-1]:
-            out=n.get_output()
+            out=n.output
             # if out>0.5:
             #     out=1
             # else:
@@ -125,7 +175,10 @@ def main():
 
     def byteToPixel(file,width,length):
         stringcode='>'+'B'*len(file)
-        data=np.array(struct.unpack(stringcode,file),dtype=np.float32)
+        x=struct.unpack(stringcode,file)
+
+        data=np.array(x)
+
         data=data.reshape(int(len(file)/(width*length)),width*length,1)/255
         return data
 
@@ -210,7 +263,7 @@ def main():
         err=0
         zz=1
         for i in range(len(inputs)):
-            net.set_input(inputs[i])
+            net.set_input(inputs[i][0])
             net.feed_forward()
             net.back_propagate(outputs[i])
             err=net.get_error(outputs[i])
