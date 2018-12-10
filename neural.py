@@ -34,12 +34,17 @@ class Neural_NetWork(object):
         self.o_error=np.sum((y-o)**2)/2
         self.d_error_output=-(y-o)
         self.d_o_net=sigmoid_derivative(o)
+        self.d_net_w=self.z2
+
+        self.d_error_w=self.d_error_output*self.d_o_net*self.d_net_w
+        x=1
 
 
 
 
 
 
+        # self.o_error=y-o
         # self.o_delta=self.o_error*sigmoid_derivative(o)
         #
         # self.z2_error=self.o_delta.dot(self.Weight_2.T)
