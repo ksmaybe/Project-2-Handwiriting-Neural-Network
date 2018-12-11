@@ -63,6 +63,7 @@ class Neuron:
             y=np.array(y)
             sum=np.dot(x,y)
             self.output=sigmoid(sum)
+            xx=0
         else:
             self.output=0.5
 
@@ -170,114 +171,113 @@ class N_Network:
         output.pop()     #remove bias neuron
         return output
 
-def main():
-    train_image="train_images.raw"
+train_image="train_images.raw"
 
-    def byteToPixel(file,width,length):
-        stringcode='>'+'B'*len(file)
-        x=struct.unpack(stringcode,file)
+def byteToPixel(file,width,length):
+    stringcode='>'+'B'*len(file)
+    x=struct.unpack(stringcode,file)
 
-        data=np.array(x)
+    data=np.array(x)
 
-        data=data.reshape(int(len(file)/(width*length)),width*length,1)/255
-        return data
+    data=data.reshape(int(len(file)/(width*length)),width*length,1)/255
+    return data
 
-    ff=open(train_image,'rb')
-    bytefile=ff.read()
-    train_lst=byteToPixel(bytefile,28,28)
-
-
-    # #read train image to integer values
-
-    # train_lst=[]
-    # p="train_img/"
-    # x=os.listdir("train_img")
-    # no_of_train=10 #len(x)
-    # for i in range(no_of_train):
-    #     image=cv2.imread(p+x[i],0)
-    #     img=cv2.bitwise_not(image)
-    #     img1=[]
-    #     for c in img:
-    #         img1.extend(c)
-    #     train_lst.append(img1)
-
-    #read training labels
-    f=open("train_labels.txt",'r')
-    read_lines_train=f.readlines()
-    train_label=[]
-    for line in read_lines_train:
-        mlst=[]
-        for c in line:
-            if c.isnumeric():
-                mlst.append(int(c))
-        train_label.append(mlst)
-    train_label=train_label #[:no_of_train]
-
-    #read test image to integer values
-
-    test_image="test_images.raw"
+ff=open(train_image,'rb')
+bytefile=ff.read()
+train_lst=byteToPixel(bytefile,28,28)
 
 
-    fg=open(test_image,'rb')
-    bytefile1=fg.read()
-    test_lst=byteToPixel(bytefile1,28,28)
-    no_of_test=len(test_lst)
+# #read train image to integer values
 
-    # test_lst=[]
-    # p="train_img/"
-    # k=os.listdir("train_img")
-    #no_of_test=len(k)
-    # for i in range(no_of_test):
-    #     image=cv2.imread(p+k[i],0)
-    #     img=cv2.bitwise_not(image)
-    #     img1=[]
-    #     for c in img:
-    #         img1.extend(c)
-    #     test_lst.append(img1)
+# train_lst=[]
+# p="train_img/"
+# x=os.listdir("train_img")
+# no_of_train=10 #len(x)
+# for i in range(no_of_train):
+#     image=cv2.imread(p+x[i],0)
+#     img=cv2.bitwise_not(image)
+#     img1=[]
+#     for c in img:
+#         img1.extend(c)
+#     train_lst.append(img1)
 
-    #read test labels
-    g=open("test_labels.txt",'r')
-    read_lines_test=g.readlines()
-    test_label=[]
-    for line in read_lines_test:
-        mlst=[]
-        for c in line:
-            if c.isnumeric():
-                mlst.append(int(c))
-        test_label.append(mlst)
-    test_label=test_label #[:no_of_test]
+#read training labels
+f=open("train_labels.txt",'r')
+read_lines_train=f.readlines()
+train_label=[]
+for line in read_lines_train:
+    mlst=[]
+    for c in line:
+        if c.isnumeric():
+            mlst.append(int(c))
+    train_label.append(mlst)
+train_label=train_label #[:no_of_train]
+
+#read test image to integer values
+
+test_image="test_images.raw"
+
+
+fg=open(test_image,'rb')
+bytefile1=fg.read()
+test_lst=byteToPixel(bytefile1,28,28)
+no_of_test=len(test_lst)
+
+# test_lst=[]
+# p="train_img/"
+# k=os.listdir("train_img")
+#no_of_test=len(k)
+# for i in range(no_of_test):
+#     image=cv2.imread(p+k[i],0)
+#     img=cv2.bitwise_not(image)
+#     img1=[]
+#     for c in img:
+#         img1.extend(c)
+#     test_lst.append(img1)
+
+#read test labels
+g=open("test_labels.txt",'r')
+read_lines_test=g.readlines()
+test_label=[]
+for line in read_lines_test:
+    mlst=[]
+    for c in line:
+        if c.isnumeric():
+            mlst.append(int(c))
+    test_label.append(mlst)
+test_label=test_label #[:no_of_test]
 
 
 
-    #begin neural network
-    set=[]
-    set.append(28*28)
-    set.append(50)
-    set.append(5)
-    net=N_Network(set)
-    Neuron.E=0.09
-    Neuron.A=0.015
-    inputs=train_lst
-    outputs=train_label
-    while True:
-        err=0
-        zz=1
-        for i in range(len(inputs)):
-            net.set_input(inputs[i][0])
-            net.feed_forward()
-            net.back_propagate(outputs[i])
-            err=net.get_error(outputs[i])
-            print(zz,"output train: ",net.get_results())
-            print("train_label: ", train_label[i])
-            zz+=1
-        print("total err: ",err)
-        if err<0.1:
-            break
-    for z in range(no_of_test):
-        k=test_lst[z]
-        net.set_input(k)
+#begin neural network
+set=[]
+set.append(28*28)
+set.append(50)
+set.append(5)
+net=N_Network(set)
+Neuron.E=0.09
+Neuron.A=0.015
+inputs=train_lst
+outputs=train_label
+while True:
+    err=0
+    zz=1
+    for i in range(len(inputs)):
+        net.set_input(inputs[i][0])
         net.feed_forward()
-        print("Results: ",net.get_results())
-        print("Label: ",test_label[z])
-main()
+        net.back_propagate(outputs[i])
+        err=net.get_error(outputs[i])
+        print(zz,"output train: ",net.get_results())
+        print("train_label: ", train_label[i])
+        zz+=1
+        break
+    print("total err: ",err)
+    if err<0.1:
+        break
+for z in range(no_of_test):
+    k=test_lst[z]
+    net.set_input(k)
+    net.feed_forward()
+    print("Results: ",net.get_results())
+    print("Label: ",test_label[z])
 
