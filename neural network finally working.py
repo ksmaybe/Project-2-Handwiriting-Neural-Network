@@ -1,12 +1,15 @@
 import struct
 
 import numpy as np
+from numba import vectorize
 
 
-lr=0.5
+lr=0.5   #learning rate
+
+#sigmoid function/activation
 def sigmoid(x):
     return 1/(1+np.exp(-x))
-
+#sigmoid prime
 def sigmoid_derivative(x):
     return x*(1-x)
 
@@ -16,25 +19,20 @@ class Neural_NetWork(object):
     def __init__(self):
         #parameters
         self.input_size=784
-        self.hidden_size=300
+        self.hidden_size=100
         self.output_size=5
-        self.old_error=99999
+        self.old_error=99999    #sum of error
         self.new_error=0
         self.o_error=999
 
         #The weight matrixes
         self.Weight_1=np.random.uniform(-2,2,(self.input_size,self.hidden_size))
         self.Weight_2=np.random.uniform(-2,2,(self.hidden_size,self.output_size))
-        # for h in self.Weight_1:
-        #     for k in h:
-        #         k=np.random.normal()
-        # for h in self.Weight_2:
-        #     for k in h:
-        #         k=np.random.normal()
+
 
     def feed_forward(self,X):
 
-        self.z=np.dot(X,self.Weight_1)+bias
+        self.z=np.dot(X,self.Weight_1)+bias  #sum of Weight and output
         self.z2=sigmoid(self.z)
         self.z3=np.dot(self.z2,self.Weight_2)+bias
         o=sigmoid(self.z3)
@@ -136,7 +134,7 @@ net=Neural_NetWork()
 lstp=[]
 for e in range(100):
     print("e:",e)
-    for i in range(10000):
+    for i in range(len(train_lst)):
         X=train_lst[i]
         y=train_label[i]
         o=net.feed_forward(X)
@@ -144,7 +142,7 @@ for e in range(100):
         net.new_error+=net.o_error
     lstp.append(net.new_error)
     print(net.new_error)
-    if net.old_error-net.new_error<10:
+    if net.old_error-net.new_error<10 and e>10:
         break
     net.old_error=net.new_error
     net.new_error=0
@@ -155,6 +153,7 @@ for e in range(100):
     # if net.new_error-net.old_error<0.01:
     #     break
 confusion_matrix=np.array([0]*25).reshape(5,5)
+success=0
 for i in range(len(test_label)):
 
     o=net.feed_forward(test_lst[i])
@@ -170,10 +169,16 @@ for i in range(len(test_label)):
             y=j
             break
     confusion_matrix[x][y]+=1
+    if x==y:
+        success+=1
 
-x=0
+
+
 
 
 print()
 print("confusion matrix")
 print(confusion_matrix)
+print()
+print("success: ",success,'/',len(test_label))
+print("success rate: ",float(success/len(test_label)))
