@@ -36,28 +36,37 @@ import numpy as np
 #     train_lst.append(img1)
 #
 # print(train_lst)
-train_image="train_images.raw"
 
-def byteToPixel(file,width,length):
-    stringcode='>'+'B'*len(file)
-    x=struct.unpack(stringcode,file)
+#
+#
+# train_image="train_images.raw"
+#
+# def byteToPixel(file,width,length):
+#     stringcode='>'+'B'*len(file)
+#     x=struct.unpack(stringcode,file)
+#
+#     data=np.array(x)
+#
+#     data=data.reshape(int(len(file)/(width*length)),width*length)/255
+#
+#     return data
+#
+# ff=open(train_image,'rb')
+# bytefile=ff.read()
+# train_lst=byteToPixel(bytefile,28,28)
+# x=train_lst[0]
+#
+# z=np.random.random((50,5))
+# xz=np.array([1]*50)
+# for h in z:
+#     for k in h:
+#         k=np.random.normal()
+#
+# print(z)
+# x=1
 
-    data=np.array(x)
-
-    data=data.reshape(int(len(file)/(width*length)),width*length)/255
-
-    return data
-
-ff=open(train_image,'rb')
-bytefile=ff.read()
-train_lst=byteToPixel(bytefile,28,28)
-x=train_lst[0]
-
-z=np.random.random((50,5))
-xz=np.array([1]*50)
-for h in z:
-    for k in h:
-        k=np.random.normal()
-
+x=259
+y=77
+z=(x%y)
 print(z)
-x=1
+print(y%z)
