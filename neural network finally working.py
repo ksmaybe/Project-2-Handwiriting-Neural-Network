@@ -19,7 +19,7 @@ class Neural_NetWork(object):
     def __init__(self):
         #parameters
         self.input_size=784
-        self.hidden_size=100
+        self.hidden_size=300
         self.output_size=5
         self.old_error=99999    #sum of error
         self.new_error=0
@@ -33,22 +33,25 @@ class Neural_NetWork(object):
     def feed_forward(self,X):
 
         self.z=np.dot(X,self.Weight_1)+bias  #sum of Weight and output
-        self.z2=sigmoid(self.z)
+        self.z2=sigmoid(self.z)                      #hidden layer activation
         self.z3=np.dot(self.z2,self.Weight_2)+bias
-        o=sigmoid(self.z3)
+        o=sigmoid(self.z3)                      #output layer activation
         return o
 
     def back_propagation(self,X,y,o):
-        self.o_error=np.sum((y-o)**2)/2
+        self.o_error=np.sum((y-o)**2)/2         #get sum of error/ accuracy check
 
+        #get Err
         self.d_Et_Ot=-(y - o)
         self.d_o_net=sigmoid_derivative(o).reshape((1,5))
         self.d_net_w=self.z2.repeat(5).reshape(self.hidden_size,5)*(self.Weight_2**0)
 
+        #get dError/dWeight for output layer
         xx= self.d_Et_Ot * self.d_o_net
         self.d_error_w= xx*self.d_net_w
         self.Weight_2-=lr*self.d_error_w
 
+        #get dError/dWeight for hidden layer
         self.d_Eo_No=self.d_Et_Ot*self.d_o_net
         self.d_No_Oh=self.Weight_2
 
@@ -61,22 +64,14 @@ class Neural_NetWork(object):
         self.Weight_1-=lr*self.d_Et_w
 
 
-        # self.o_error=y-o
-        # self.o_delta=self.o_error*sigmoid_derivative(o)
-        #
-        # self.z2_error=self.o_delta.dot(self.Weight_2.T)
-        # self.z2_delta=self.z2_error*sigmoid_derivative(self.z2)
-        #
-        # self.Weight_1+=X.T.dot(self.z2_delta)
-        # self.Weight_2+=self.z2.T.dot(self.o_delta)
-
-    def train(self,X,y):
+    def train(self,X,y):            #forward and back once/train once
         o=self.feed_forward(X)
         self.back_propagation(X,y,o)
 
 
 train_image="train_images.raw"
 
+#turn raw file to np array
 def byteToPixel(file,width,length):
     stringcode='>'+'B'*len(file)
     x=struct.unpack(stringcode,file)
@@ -87,7 +82,7 @@ def byteToPixel(file,width,length):
 
     return data
 
-ff=open(train_image,'rb')
+ff=open(train_image,'rb')           #read raw
 bytefile=ff.read()
 train_lst=byteToPixel(bytefile,28,28)
 
@@ -130,6 +125,7 @@ test_label=np.array(test_label) #[:no_of_test]
 X=train_lst
 y=train_label
 
+#start of training
 net=Neural_NetWork()
 lstp=[]
 for e in range(100):
@@ -142,16 +138,12 @@ for e in range(100):
         net.new_error+=net.o_error
     lstp.append(net.new_error)
     print(net.new_error)
-    if net.old_error-net.new_error<10 and e>10:
+    if net.old_error-net.new_error<5 and e>10 and net.new_error<1000:  #after 10 epoches and change in sum of error between epoch very small
         break
     net.old_error=net.new_error
     net.new_error=0
 
-
-
-    # net.new_error=net.old_error
-    # if net.new_error-net.old_error<0.01:
-    #     break
+#draw confusion matrix
 confusion_matrix=np.array([0]*25).reshape(5,5)
 success=0
 for i in range(len(test_label)):
