@@ -1,11 +1,15 @@
 import struct
 
+
+import random
+
+import gzip
 import cv2
 import os
 import copy
-import rawpy
-import imageio
 import numpy as np
+import matplotlib.pyplot as plt
+
 # #read train image to integer values
 # no_of_train=1
 # train_lst=[]
@@ -62,11 +66,29 @@ import numpy as np
 #     for k in h:
 #         k=np.random.normal()
 #
+# print(z)x=259
+# y=77
+# z=(x%y)
 # print(z)
+# print(y%z)
 # x=1
 
-x=259
-y=77
-z=(x%y)
-print(z)
-print(y%z)
+# f=gzip.open('t10k-images-idx3-ubyte.gz','r')
+# f.read(16)
+# buf=f.read(28*28*5)
+# image_size=28
+# num_images=5
+# data = np.frombuffer(buf, dtype=np.uint8).astype(np.float32)
+# data = data.reshape(num_images, image_size, image_size, 1)
+# image=np.asarray(data[2]).squeeze()
+# plt.imshow
+
+f = gzip.open('train-labels-idx1-ubyte.gz','r')
+for i in range(0,3):
+    buf = f.read(8)
+    labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
+    print(labels)
+for i in range(0):
+    buf = f.read(1)
+    labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
+    print(labels)

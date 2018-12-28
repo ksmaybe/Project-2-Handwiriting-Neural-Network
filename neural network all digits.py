@@ -1,9 +1,8 @@
 import struct
 
-import mnist as mnist
 import numpy as np
-from numba import vectorize
-import mnist
+
+
 
 lr=0.5   #learning rate
 
@@ -21,7 +20,7 @@ class Neural_NetWork(object):
         #parameters
         self.input_size=784
         self.hidden_size=300
-        self.output_size=5
+        self.output_size=10
         self.old_error=99999    #sum of error
         self.new_error=0
         self.o_error=999
@@ -44,8 +43,8 @@ class Neural_NetWork(object):
 
         #get Err
         self.d_Et_Ot=-(y - o)
-        self.d_o_net=sigmoid_derivative(o).reshape((1,5))
-        self.d_net_w=self.z2.repeat(5).reshape(self.hidden_size,5)*(self.Weight_2**0)
+        self.d_o_net=sigmoid_derivative(o).reshape((1,self.output_size))
+        self.d_net_w=self.z2.repeat(self.output_size).reshape(self.hidden_size,self.output_size)*(self.Weight_2**0)
 
         #get dError/dWeight for output layer
         xx= self.d_Et_Ot * self.d_o_net
