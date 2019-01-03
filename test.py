@@ -8,7 +8,7 @@ import cv2
 import os
 import copy
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 # #read train image to integer values
 # no_of_train=1

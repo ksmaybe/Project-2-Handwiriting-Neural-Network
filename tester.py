@@ -30,7 +30,7 @@ class Neuron:
 
     def sigmoid(self, x):
         return 1 / (1 + math.exp(-x * 1.0))
-
+ 
     def dSigmoid(self, x):
         return x * (1.0 - x)
 
