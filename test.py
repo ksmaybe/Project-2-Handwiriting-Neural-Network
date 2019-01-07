@@ -10,85 +10,57 @@ import copy
 import numpy as np
 
 
-# #read train image to integer values
-# no_of_train=1
-# train_lst=[]
-# p="train_img/"
-# x=os.listdir("train_img")
-# for i in range(no_of_train):
-#     image=cv2.imread(p+x[i],0)
-#     img=cv2.bitwise_not(image)
-#     img1=[]
-#     for c in img:
-#         img1.extend(c)
-#     print(img1)
 #
+# f = gzip.open('train-labels-idx1-ubyte.gz','r')
+# train_labeler=np.array([])
 #
-# print(train_lst)
+# for i in range(1):
+#     buf = f.read(8)
+#     labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
+#     print(labels)
+# for i in range(60000):
+#     buf = f.read(1)
+#     labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
+#     train_labeler=np.append(train_labeler,labels)
+# train_label=[]
+# for j in range(len(train_labeler)):
+#     x=[0]*10
+#     x[int(train_labeler[j])]=1
+#     train_label.append(x)
+# print(len(train_label))
 
-#read train image to integer values
-# no_of_train=3000
-# train_lst=[]
-# p="train_img/"
-# x=os.listdir("train_img")
-# for i in range(no_of_train):
-#     image=cv2.imread(p+x[i],0)
-#     img=cv2.bitwise_not(image)
-#     img1=[]
-#     for c in img:
-#         img1.extend(c)
-#     train_lst.append(img1)
-#
-# print(train_lst)
 
-#
-#
-# train_image="train_images.raw"
-#
-# def byteToPixel(file,width,length):
-#     stringcode='>'+'B'*len(file)
-#     x=struct.unpack(stringcode,file)
-#
-#     data=np.array(x)
-#
-#     data=data.reshape(int(len(file)/(width*length)),width*length)/255
-#
-#     return data
-#
-# ff=open(train_image,'rb')
-# bytefile=ff.read()
-# train_lst=byteToPixel(bytefile,28,28)
-# x=train_lst[0]
-#
-# z=np.random.random((50,5))
-# xz=np.array([1]*50)
-# for h in z:
-#     for k in h:
-#         k=np.random.normal()
-#
-# print(z)x=259
-# y=77
-# z=(x%y)
-# print(z)
-# print(y%z)
-# x=1
+f = gzip.open('train-images-idx3-ubyte.gz','r')
+train_lst=np.array([])
 
-# f=gzip.open('t10k-images-idx3-ubyte.gz','r')
-# f.read(16)
-# buf=f.read(28*28*5)
-# image_size=28
-# num_images=5
-# data = np.frombuffer(buf, dtype=np.uint8).astype(np.float32)
-# data = data.reshape(num_images, image_size, image_size, 1)
-# image=np.asarray(data[2]).squeeze()
-# plt.imshow
-
-f = gzip.open('train-labels-idx1-ubyte.gz','r')
-for i in range(0,3):
+for i in range(2):
     buf = f.read(8)
     labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
     print(labels)
-for i in range(0):
-    buf = f.read(1)
-    labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
-    print(labels)
+kk=0
+kkk=0
+buf = f.read(28*28*60001)
+labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
+train_lst=np.append(train_lst,labels)
+print(train_lst,'train_lst')
+for j in range(len(train_lst)):
+    if train_lst[j]>0:
+        kk+=1
+    if train_lst[j]>kkk:
+        kkk=train_lst[j]
+
+print(kk)
+print(kkk)
+train_lst=train_lst.reshape(int(len(train_lst)/(28*28)),28*28)/255
+print(len(train_lst))
+
+
+
+# for i in range(2):
+#     buf = f.read(8)
+#     labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
+#     print(labels)
+# for i in range(28):
+#     buf = f.read(28)
+#     labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
+#     print(labels)

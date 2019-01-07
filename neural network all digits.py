@@ -1,5 +1,5 @@
 import struct
-
+import gzip
 import numpy as np
 
 
@@ -68,58 +68,68 @@ class Neural_NetWork(object):
         o=self.feed_forward(X)
         self.back_propagation(X,y,o)
 
+#obtain train images
+f = gzip.open('train-images-idx3-ubyte.gz','r')
+train_lst=np.array([])
 
-train_image="train_images.raw"
+for i in range(2):
+    buf = f.read(8)
+    labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
 
-#turn raw file to np array
-def byteToPixel(file,width,length):
-    stringcode='>'+'B'*len(file)
-    x=struct.unpack(stringcode,file)
+buf = f.read(28*28*60001)
+labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
+train_lst=np.append(train_lst,labels)
+train_lst=train_lst.reshape(int(len(train_lst)/(28*28)),28*28)/255
 
-    data=np.array(x)
+#obtain train labels
+f = gzip.open('train-labels-idx1-ubyte.gz','r')
+train_labeler=np.array([])
 
-    data=data.reshape(int(len(file)/(width*length)),width*length)/255
-
-    return data
-
-ff=open(train_image,'rb')           #read raw
-bytefile=ff.read()
-train_lst=byteToPixel(bytefile,28,28)
-
-
-
-#read training labels
-f=open("train_labels.txt",'r')
-read_lines_train=f.readlines()
+for i in range(1):
+    buf = f.read(8)
+    labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
+for i in range(60000):
+    buf = f.read(1)
+    labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
+    train_labeler=np.append(train_labeler,labels)
 train_label=[]
-for line in read_lines_train:
-    mlst=[]
-    for c in line:
-        if c.isnumeric():
-            mlst.append(int(c))
-    train_label.append(mlst)
-train_label=np.array(train_label) #[:no_of_train]
+for j in range(len(train_labeler)):
+    x=[0]*10
+    x[int(train_labeler[j])]=1
+    train_label.append(x)
 
-#read test image to integer values
+#obtain test images
+f = gzip.open('t10k-images-idx3-ubyte.gz','r')
+test_lst=np.array([])
 
-test_image="test_images.raw"
+for i in range(2):
+    buf = f.read(8)
+    labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
+buf = f.read(28*28*10000)
+labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
+test_lst=np.append(test_lst,labels)
+test_lst=test_lst.reshape(int(len(test_lst)/(28*28)),28*28)/255
 
-fg=open(test_image,'rb')
-bytefile1=fg.read()
-test_lst=byteToPixel(bytefile1,28,28)
-no_of_test=len(test_lst)
 
+#obtain test label
+f = gzip.open('t10k-labels-idx1-ubyte.gz','r')
+test_labeler=np.array([])
 
-g=open("test_labels.txt",'r')
-read_lines_test=g.readlines()
+for i in range(1):
+    buf = f.read(8)
+    labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
+for i in range(10000):
+    buf = f.read(1)
+    labels = np.frombuffer(buf, dtype=np.uint8).astype(np.int64)
+    test_labeler=np.append(test_labeler,labels)
 test_label=[]
-for line in read_lines_test:
-    mlst=[]
-    for c in line:
-        if c.isnumeric():
-            mlst.append(int(c))
-    test_label.append(mlst)
-test_label=np.array(test_label) #[:no_of_test]
+for j in range(len(test_labeler)):
+    x=[0]*10
+    x[int(test_labeler[j])]=1
+    test_label.append(x)
+
+
+
 
 
 X=train_lst
@@ -129,7 +139,7 @@ y=train_label
 net=Neural_NetWork()
 lstp=[]
 for e in range(100):
-    print("e:",e)
+    print("e:",e,"  ","hidden size: ",net.hidden_size)
     for i in range(len(train_lst)):
         X=train_lst[i]
         y=train_label[i]
@@ -138,20 +148,20 @@ for e in range(100):
         net.new_error+=net.o_error
     lstp.append(net.new_error)
     print(net.new_error)
-    if net.old_error-net.new_error<5 and e>10 and net.new_error<1000:  #after 10 epoches and change in sum of error between epoch very small
+    if net.old_error-net.new_error<5 and e>10 or net.new_error<1000:  #after 10 epoches and change in sum of error between epoch very small
         break
     net.old_error=net.new_error
     net.new_error=0
 
 #draw confusion matrix
-confusion_matrix=np.array([0]*25).reshape(5,5)
+confusion_matrix=np.array([0]*100).reshape(10,10)
 success=0
 for i in range(len(test_label)):
 
     o=net.feed_forward(test_lst[i])
     x=0
     y=0
-    for j in range(5):
+    for j in range(10):
         if test_label[i][j]==1:
             x=j
             break
